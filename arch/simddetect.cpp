@@ -21,7 +21,6 @@
 #undef X86_BUILD
 #if defined(__x86_64__) || defined(__i386__) || defined(_WIN32)
 #if !defined(ANDROID_BUILD)
-#define X86_BUILD 1
 #endif  // !ANDROID_BUILD
 #endif  // x86 target
 
