@@ -1,16 +1,13 @@
 local_settings:
-    #use_shared_libs: true
-    #generator: Visual Studio 14 2015 Win64
+    generator: Visual Studio 15 2017
     silent: false
+    use_shared_libs: false
     #copy_import_libs: true
-    #build:
-        #c_flags: /W0
-        #cxx_flags: /W0
-    builds:
-        vs2017:
-            generator: Visual Studio 15 2017
-        vs2017_64:
-            generator: Visual Studio 15 2017 Win64
+    build:
+        c_flags: /W0
+        cxx_flags: /W0
+        cxx_compiler_flags_release: /MT
+        #cxx_compiler_flags_debug: /MD
 
     dependencies:
         pvt.cppan.demo.danbloomberg.leptonica: 1
@@ -120,7 +117,9 @@ projects:
           - _Bool
 
         pre_sources: |
+            include(InstallRequiredSystemLibraries)
             file_write_once(${BDIR}/config_auto.h "")
+            set(CMAKE_INSTALL_UCRT_LIBRARIES ON)
 
         post_sources: |
             if (WIN32)
@@ -148,7 +147,10 @@ projects:
                     public:
                       - HAVE_CONFIG_H
                       - _SILENCE_STDEXT_HASH_DEPRECATION_WARNINGS=1
+                      - USE_STD_NAMESPACE=1
                       - WINDLLNAME="tesseract"
+                      - _VCRTIMP= 
+                      - _ACRTIMP= 
             shared:
                 definitions:
                     private:
@@ -163,117 +165,3 @@ projects:
         files: api/tesseractmain.cpp
         dependencies:
             - libtesseract
-
-    tessopt:
-        type: lib
-        static_only: true
-        files: training/tessopt.*
-        include_directories: training
-        dependencies: libtesseract
-
-    common_training:
-        type: lib
-        static_only: true
-        files:
-            - training/commandlineflags.cpp
-            - training/commandlineflags.h
-            - training/commontraining.cpp
-            - training/commontraining.h
-        include_directories: training
-        dependencies:
-            - tessopt
-
-    ambiguous_words:
-        files: training/ambiguous_words.cpp
-        dependencies:
-            - libtesseract
-
-    classifier_tester:
-        files: training/classifier_tester.cpp
-        dependencies: common_training
-
-    combine_lang_model:
-        files: training/combine_lang_model.cpp
-        dependencies: unicharset_training
-
-    combine_tessdata:
-        files: training/combine_tessdata.cpp
-        dependencies: libtesseract
-
-    cntraining:
-        files: training/cntraining.cpp
-        dependencies: common_training
-
-    dawg2wordlist:
-        files: training/dawg2wordlist.cpp
-        dependencies: libtesseract
-
-    mftraining:
-        files:
-            - training/mftraining.cpp
-            - training/mergenf.*
-        dependencies: common_training
-
-    shapeclustering:
-        files: training/shapeclustering.cpp
-        dependencies: common_training
-
-    unicharset_extractor:
-        files: training/unicharset_extractor.cpp
-        dependencies: unicharset_training
-
-    wordlist2dawg:
-        files: training/wordlist2dawg.cpp
-        dependencies: libtesseract
-
-    unicharset_training:
-        type: lib
-        static_only: true
-        files:
-            - training/fileio.*
-            - training/icuerrorcode.h
-            - training/lang_model_helpers.*
-            - training/lstmtester.*
-            - training/normstrngs.*
-            - training/unicharset_training_utils.*
-            - training/validat.*
-        include_directories: training
-        dependencies:
-            - common_training
-            - pvt.cppan.demo.unicode.icu.i18n
-
-    lstmeval:
-        files: training/lstmeval.cpp
-        dependencies: unicharset_training
-
-    lstmtraining:
-        files: training/lstmtraining.cpp
-        dependencies: unicharset_training
-
-    set_unicharset_properties:
-        files: training/set_unicharset_properties.cpp
-        dependencies: unicharset_training
-
-    text2image:
-        files:
-            - training/text2image.cpp
-            - training/boxchar.cpp
-            - training/boxchar.h
-            - training/degradeimage.cpp
-            - training/degradeimage.h
-            - training/ligature_table.cpp
-            - training/ligature_table.h
-            - training/normstrngs.cpp
-            - training/normstrngs.h
-            - training/pango_font_info.cpp
-            - training/pango_font_info.h
-            - training/stringrenderer.cpp
-            - training/stringrenderer.h
-            - training/tlog.cpp
-            - training/tlog.h
-            - training/util.h
-            - training/icuerrorcode.h
-
-        dependencies:
-            - unicharset_training
-            - pvt.cppan.demo.gnome.pango.pangocairo: 1
